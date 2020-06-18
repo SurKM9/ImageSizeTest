@@ -7,11 +7,12 @@
 class ImageWidget : public QLabel
 {
     public:
+
         ImageWidget(QWidget* parent = nullptr);
 
         /**
          * @brief Updates the image.
-         * @param QImage
+         * @param image
          */
         void setImage(const QPixmap& image);
 
@@ -27,6 +28,8 @@ class ImageWidget : public QLabel
          * @return height
          */
         virtual int heightForWidth(int width) const override;
+
+        void updateImage();
 
     private:
 

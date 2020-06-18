@@ -10,6 +10,9 @@ ImageWidget::ImageWidget(QWidget* parent) :
     sizePolicy.setHeightForWidth(true);
     setSizePolicy(sizePolicy);
 
+    setScaledContents(true);
+    setMinimumSize(1, 1);
+
     setFrameShape(QFrame::Box);
 }
 
@@ -28,7 +31,11 @@ void ImageWidget::setImage(const QPixmap& image)
 
 QPixmap ImageWidget::scaledPixmap()
 {
-    return m_pixmap.scaled(this->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    qDebug() << "Label size: "  << this->size();
+    QPixmap pix = m_pixmap.scaled(width(), heightForWidth(width()), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    qDebug() << "Scaled image size: " << pix.size();
+
+    return pix;
 }
 
 
@@ -43,4 +50,14 @@ QPixmap ImageWidget::scaledPixmap()
 /* virtual */ int ImageWidget::heightForWidth(int width) const
 {
     return (m_cols != 0) ? width * m_rows / m_cols : width;
+}
+
+
+
+void ImageWidget::updateImage()
+{
+    if(!m_pixmap.isNull())
+    {
+        QLabel::setPixmap(scaledPixmap());
+    }
 }
