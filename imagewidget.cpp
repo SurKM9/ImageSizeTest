@@ -1,46 +1,51 @@
 #include "imagewidget.h"
 #include <QDebug>
+#include <QPainter>
+#include <QResizeEvent>
 
-ImageWidget::ImageWidget(QWidget* parent) :
-    QLabel(parent),
-    m_rows(0),
-    m_cols(0)
-{
-    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    sizePolicy.setHeightForWidth(true);
-    setSizePolicy(sizePolicy);
-
-    setFrameShape(QFrame::Box);
+ImageWidget::ImageWidget(QWidget *parent)
+    : QLabel(parent), m_rows(0), m_cols(0) {
+  setFrameShape(QFrame::Box);
+  setAlignment(Qt::AlignCenter);
 }
 
+void ImageWidget::setImage(const QPixmap &image) {
+  m_pixmap = image;
 
-void ImageWidget::setImage(const QPixmap& image)
-{
-    m_pixmap = image;
+  m_cols = m_pixmap.width();
+  m_rows = m_pixmap.height();
 
-    m_cols = m_pixmap.width();
-    m_rows = m_pixmap.height();
-
-    QLabel::setPixmap(scaledPixmap());
+  updatePixmap();
 }
 
+/* virtual */ QSize ImageWidget::sizeHint() const { return m_square.size(); }
 
-
-QPixmap ImageWidget::scaledPixmap()
-{
-    return m_pixmap.scaled(this->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+/* virtual */ void ImageWidget::resizeEvent(QResizeEvent *e) {
+  QLabel::resizeEvent(e);
+  updatePixmap();
 }
 
+void ImageWidget::updatePixmap() {
 
+  static constexpr int margin =
+      10; // space between the outer frame (our border) and the actual square
+          // image (the blue background currently)
+  const int side = qMin(width(), height()) - margin;
 
-/* virtual */ QSize ImageWidget::sizeHint() const
-{
-    return QSize(m_cols, heightForWidth(m_cols));
-}
+  m_square = QPixmap(side, side);
+  m_square.fill(Qt::blue);
 
+  if (!m_pixmap.isNull()) {
+    QPainter p(&m_square);
+    const QPixmap scaled = m_pixmap.scaled(m_square.size(), Qt::KeepAspectRatio,
+                                           Qt::SmoothTransformation);
+    const QRect &scaledRect = scaled.rect();
+    const QRect &bgrRect = m_square.rect();
 
+    // draw the scaled image in the center of the square:
+    p.drawPixmap((bgrRect.width() - scaledRect.width()) / 2,
+                 (bgrRect.height() - scaledRect.height()) / 2, scaled);
+  }
 
-/* virtual */ int ImageWidget::heightForWidth(int width) const
-{
-    return (m_cols != 0) ? width * m_rows / m_cols : width;
+  setPixmap(m_square);
 }
