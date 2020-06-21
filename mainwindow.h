@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QString>
+#include <QResizeEvent>
 
 class ImageWidget;
 
@@ -13,11 +14,14 @@ class MainWindow : public QMainWindow
     public:
 
         MainWindow(QWidget* parent = nullptr);
-        ~MainWindow();
 
     public slots:
 
         void on_btn_clicked();
+
+    protected:
+
+        virtual void resizeEvent(QResizeEvent* event) override;
 
     private:
 

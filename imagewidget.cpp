@@ -7,6 +7,15 @@ ImageWidget::ImageWidget(QWidget *parent)
     : QLabel(parent), m_rows(0), m_cols(0) {
   setFrameShape(QFrame::Box);
   setAlignment(Qt::AlignCenter);
+{
+    QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    sizePolicy.setHeightForWidth(true);
+    setSizePolicy(sizePolicy);
+
+    setScaledContents(true);
+    setMinimumSize(1, 1);
+
+    setFrameShape(QFrame::Box);
 }
 
 void ImageWidget::setImage(const QPixmap &image) {
@@ -23,6 +32,15 @@ void ImageWidget::setImage(const QPixmap &image) {
 /* virtual */ void ImageWidget::resizeEvent(QResizeEvent *e) {
   QLabel::resizeEvent(e);
   updatePixmap();
+
+
+QPixmap ImageWidget::scaledPixmap()
+{
+    qDebug() << "Label size: "  << this->size();
+    QPixmap pix = m_pixmap.scaled(width(), heightForWidth(width()), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    qDebug() << "Scaled image size: " << pix.size();
+
+    return pix;
 }
 
 void ImageWidget::updatePixmap() {
@@ -48,4 +66,14 @@ void ImageWidget::updatePixmap() {
   }
 
   setPixmap(m_square);
+}
+
+
+
+void ImageWidget::updateImage()
+{
+    if(!m_pixmap.isNull())
+    {
+        QLabel::setPixmap(scaledPixmap());
+    }
 }

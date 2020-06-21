@@ -30,13 +30,6 @@ MainWindow::MainWindow(QWidget* parent)
 
 
 
-
-MainWindow::~MainWindow()
-{
-}
-
-
-
 void MainWindow::on_btn_clicked()
 {
     m_imageName = QFileDialog::getOpenFileName(nullptr, "Choose a file", QString(),
@@ -46,5 +39,12 @@ void MainWindow::on_btn_clicked()
     {
         m_imageWidget->setImage(QPixmap::fromImage(QImage(m_imageName)));
     }
+}
+
+
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+    m_imageWidget->updateImage();
 }
 
